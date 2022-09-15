@@ -1,3 +1,4 @@
+from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -7,7 +8,6 @@ import numpy as np
 import config.setup as setup
 from config.config import Config
 warnings.filterwarnings('ignore')
-
 
 # 構成のセットアップ
 cfg = setup.setup(Config)
@@ -25,10 +25,17 @@ df['mid_goal'] = ((df_goal['goal_inf'].astype(int) + df_goal['goal_sup'].astype(
 df['word_count'] = df['html_content'].str.split().str.len()
 df['inner_link'] = df['html_content'].str.count('href=')
 df['num_lines'] = df['html_content'].str.count('\n') + 1
+# labelEncoding
+le = LabelEncoder()
+le.fit(df['country'])
+label_encoded_column = le.fit_transform(df['country'])
+df['country'] = pd.Series(label_encoded_column).astype('category')
+
 df_train = df[df['train_flag']==True]
 df_train = df_train.drop(['train_flag'], axis=1)
+df_train[cfg.target] = df_train[cfg.target].astype('int')
 df_test = df[df['train_flag']==False]
 df_test = df_test.drop(['train_flag'], axis=1)
 
-df_train.to_csv(os.path.join(cfg.INPUT, "processed/processed_train.csv"))
-df_test.to_csv(os.path.join(cfg.INPUT, "processed/processed_test.csv"))
+df_train.to_csv(os.path.join(cfg.INPUT, "processed/processed_train.csv"), index=False)
+df_test.to_csv(os.path.join(cfg.INPUT, "processed/processed_test.csv"), index=False)

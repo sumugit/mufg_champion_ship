@@ -9,7 +9,7 @@ class Config:
     # パラメータ設定
     target = 'state'                # 目的変数
     num_class = 2                   # クラス数
-    seed = 2014                     # seed 値
+    seed = 2018                     # seed 値
     num_fold = 5                    # CV 分割数
     trn_fold = range(5)             # Fold
     batch_size = 8                 # batct_size の設定
