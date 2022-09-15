@@ -19,7 +19,7 @@ def setup(cfg):
     cfg.OUTPUT_EXP = os.path.join(cfg.OUTPUT, cfg.EXP)
     cfg.FINAL = os.path.join(cfg.OUTPUT, "final")
     cfg.EXP_PRETRAIN = os.path.join(
-        cfg.PRETRAIN, "deverta_v3_large_5fold")  # 適宜修正
+        cfg.PRETRAIN, "deberta_large_5fold_2018")  # 適宜修正
     cfg.EXP_MODEL = os.path.join(cfg.EXP, "model")
     cfg.EXP_FIG = os.path.join(cfg.EXP, "fig")
     cfg.EXP_PREDS = os.path.join(cfg.EXP, "preds")
@@ -29,7 +29,7 @@ def setup(cfg):
         os.makedirs(d, exist_ok=True)
     return cfg
 
-def set_seed(seed=2022):
+def set_seed(seed=2018):
     """ config seed number """
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
