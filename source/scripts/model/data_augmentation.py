@@ -1,14 +1,16 @@
 import re
+import sys
+sys.path.append('../')
 import nltk
 import random
-import setup
+import config.setup as setup
 import pandas as pd
 import warnings
 from bs4 import BeautifulSoup
 warnings.filterwarnings('ignore')
 import unicodedata
 from nltk.corpus import wordnet
-from configuration import Config
+from config.config import Config
 cfg = setup.setup(Config)
 
 

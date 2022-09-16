@@ -29,7 +29,7 @@ def setup(cfg):
         os.makedirs(d, exist_ok=True)
     return cfg
 
-def set_seed(seed=42):
+def set_seed(seed=2022):
     """ config seed number """
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)

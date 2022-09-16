@@ -69,27 +69,27 @@ def training(cfg, train, test):
     for fold in cfg.trn_fold:
         cnt = 0  # Peudo Labeling のカウンタ
         percentage = 0  # test label の確信度 (> confidence)
-        while percentage < cfg.confidence:
+        while cnt < 2:
             # データの分割, Dataset作成
             if cnt == 0:
                 train_df = train.loc[cfg.folds != fold]
                 valid_df = train.loc[cfg.folds == fold]
                 # Data Augmentation
-                train_df, valid_df = data_li_exchange_augment(train_df, valid_df)
+                # train_df, valid_df = data_li_exchange_augment(train_df, valid_df)
                 # train_df, valid_df = data_mask_augment(train_df, valid_df)
                 valid_idx = list(valid_df.index)
             train_idx = list(train_df.index)
             # 学習データ
             train_dataset = BERTDataset(
                 cfg,
-                train_df['description'].to_numpy(),
-                train_df['jobflag'].to_numpy(),
+                train_df['html_content'].to_numpy(),
+                train_df[cfg.target].to_numpy(),
             )
             # 検証データ
             valid_dataset = BERTDataset(
                 cfg,
-                valid_df['description'].to_numpy(),
-                valid_df['jobflag'].to_numpy()
+                valid_df['html_content'].to_numpy(),
+                valid_df[cfg.target].to_numpy()
             )
             # Dataloader作成
             train_loader = DataLoader(
@@ -159,7 +159,7 @@ def training(cfg, train, test):
             # The number of steps for the warmup phase. (lr を更新するタイミング)
             num_warmup_steps = int(
                 num_train_optimization_steps * cfg.num_warmup_steps_rate)
-            scheduler = get_linear_schedule_with_warmup(
+            scheduler = get_cosine_schedule_with_warmup(
                 optimizer,
                 num_warmup_steps=num_warmup_steps,
                 num_training_steps=num_train_optimization_steps
@@ -174,6 +174,7 @@ def training(cfg, train, test):
                 # val_losses_batch = []
                 scaler = GradScaler()
                 # fgm = FGM(model)
+                """
                 awp = AWP(
                     model,
                     optimizer,
@@ -182,6 +183,7 @@ def training(cfg, train, test):
                     start_epoch=cfg.start_epoch,
                     scaler=scaler
                 )
+                """
                 # progress bar は pbar と表記することが多いみたい...
                 with tqdm(train_loader, total=len(train_loader), disable=cfg.disable) as pbar:
                     # batch 毎の処理 (batch_size は DataLoader で定義済み)
@@ -211,6 +213,7 @@ def training(cfg, train, test):
                         # Adversarial training
                         # embedding layer に敵対的な摂動を加える
                         # fgm.attack()
+                        """
                         awp.attack_backward(encoding, labels, epoch)
                         # 敵対的な摂動を加えられた状態での損失を計算
                         
@@ -227,6 +230,7 @@ def training(cfg, train, test):
                         
                         # fgm.restore()
                         awp.restore()
+                        """
                         # Clipping gradients
                         if cfg.clip_grad_norm is not None:
                             torch.nn.utils.clip_grad_norm_(
@@ -253,7 +257,7 @@ def training(cfg, train, test):
                             labels = labels.to(cfg.device)
                             with autocast():
                                 output, loss = model(encoding, labels)
-                            output = output.softmax(axis=1).detach().cpu().numpy()  # 4 クラスそれぞれの出力確率
+                            output = output.sigmoid().detach().cpu().numpy()
                             val_preds.append(output)
                             val_losses.append(loss.item() * len(labels))
                             val_nums.append(len(labels))
@@ -265,7 +269,7 @@ def training(cfg, train, test):
                 val_loss = sum(val_losses) / sum(val_nums)
                 # validation 評価
                 score = f1_score(np.argmax(val_preds, axis=1),
-                                valid_df[cfg.target], average='macro')
+                                valid_df[cfg.target])
                 val_log = {
                     'val_loss': val_loss,
                     'score': score,
@@ -296,6 +300,6 @@ def training(cfg, train, test):
     # 全ての KFold から得られた予測値を保存
     np.save(os.path.join(cfg.EXP_PREDS, 'oof_pred.npy'), oof_pred)
     score = f1_score(np.argmax(oof_pred, axis=1),
-                    train[cfg.target] - 1, average='macro')
+                    train[cfg.target] - 1)
     print('CV:', round(score, 5))
     return score

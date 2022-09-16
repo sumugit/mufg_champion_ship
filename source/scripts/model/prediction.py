@@ -18,7 +18,7 @@ def pseudo_inferring(cfg, fold_train, test):
     # dataset, dataloaderの作成
     test_dataset = BERTDataset(
         cfg,
-        test['description'].to_numpy()
+        test['html_content'].to_numpy()
     )
     test_loader = DataLoader(
         dataset=test_dataset,
@@ -65,7 +65,7 @@ def inferring(cfg, test):
         # dataset, dataloaderの作成
         test_dataset = BERTDataset(
             cfg,
-            test['description'].to_numpy()
+            test[cfg.target].to_numpy()
         )
         test_loader = DataLoader(
             dataset=test_dataset,

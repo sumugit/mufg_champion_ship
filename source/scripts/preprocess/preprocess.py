@@ -25,11 +25,23 @@ df['mid_goal'] = ((df_goal['goal_inf'].astype(int) + df_goal['goal_sup'].astype(
 df['word_count'] = df['html_content'].str.split().str.len()
 df['inner_link'] = df['html_content'].str.count('href=')
 df['num_lines'] = df['html_content'].str.count('\n') + 1
+df_goal = df['html_content'].replace('\n', '')
 # labelEncoding
 le = LabelEncoder()
 le.fit(df['country'])
 label_encoded_column = le.fit_transform(df['country'])
 df['country'] = pd.Series(label_encoded_column).astype('category')
+
+df['html_content'] = df['html_content'].astype(str)
+cat1 = df['category1'].tolist()
+cat2 = df['category2'].tolist()
+replaced_texts = [text.replace('\n', '')
+                for text in df['html_content'].tolist()]
+converted_texts = []
+for cat1_, cat2_, text in zip(cat1, cat2, replaced_texts):
+    found = text.replace('<div class="contents">', '')[:-6]
+    converted_texts.append(cat1_ + ' ' + cat2_ + ' ' + found)
+df['html_content'] = converted_texts
 
 df_train = df[df['train_flag']==True]
 df_train = df_train.drop(['train_flag'], axis=1)
