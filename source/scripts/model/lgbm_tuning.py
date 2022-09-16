@@ -87,4 +87,4 @@ for fold in cfg.trn_fold:
         'reg_lambda': best['reg_lambda'],
     }
     print(best)
-    break
+    break  # fold1 のみで tuning

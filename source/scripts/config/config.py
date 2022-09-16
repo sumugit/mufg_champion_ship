@@ -1,7 +1,7 @@
 class Config:
     """ path or parameter configration """
     # 学習するモデルの読み込み
-    MODEL_PATH = 'microsoft/deberta-large'
+    MODEL_PATH = 'roberta-large'
     MODEL_PATH2 = '/home/sumiya/signate/mufg/source/pretrain/deverta_v3_large_5fold/compe2022-deberta-v3-large/'
     # ベースとなるディレクトリパスの指定
     PATH = '/home/sumiya/signate/mufg/source'
@@ -9,7 +9,7 @@ class Config:
     # パラメータ設定
     target = 'state'                # 目的変数
     num_class = 2                   # クラス数
-    seed = 2018                     # seed 値
+    seed = 42                       # seed 値
     num_fold = 5                    # CV 分割数
     trn_fold = range(5)             # Fold
     batch_size = 8                 # batct_size の設定

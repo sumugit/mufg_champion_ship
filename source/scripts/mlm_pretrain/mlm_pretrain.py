@@ -55,4 +55,4 @@ trainer = Trainer(
 
 
 trainer.train()
-trainer.save_model(os.path.join(cfg.EXP_PRETRAIN, 'mufg-deberta-large'))
+trainer.save_model(os.path.join(cfg.EXP_PRETRAIN, 'mufg-roberta-large'))
