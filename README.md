@@ -6,9 +6,12 @@
     - SEED : 1998
     - CV : 0.80501
     - LB : 0.82094
-- LGBM
-    - EX003
+- EX003
+    - LGBM
         - SEED : 2014
         - TUN : {'num_leaves': 26, 'max_depth': 8, 'reg_lambda': 0.03565525423207128}
         - CV : 0.75808
         - LB : 
+    - BERT
+        - SEED : 2014
+        - CV : 0.80529

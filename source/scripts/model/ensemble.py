@@ -24,7 +24,7 @@ submission = pd.read_csv(os.path.join(
 
 sub_pred = np.zeros(shape=(dataset_test.shape[0], cfg.num_class))
 
-ensemble_list = ['OUT_EX001', 'OUT_EX002']
+ensemble_list = ['OUT_EX001', 'OUT_EX002', 'OUT_EX003']
 for out in ensemble_list:
     expxxx = os.path.join(cfg.OUTPUT, out)
     expxxx_model = os.path.join(expxxx, 'preds')
