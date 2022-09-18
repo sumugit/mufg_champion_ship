@@ -1,3 +1,4 @@
+from unicodedata import category
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 import sys
@@ -26,11 +27,6 @@ df['word_count'] = df['html_content'].str.split().str.len()
 df['inner_link'] = df['html_content'].str.count('href=')
 df['num_lines'] = df['html_content'].str.count('\n') + 1
 df_goal = df['html_content'].replace('\n', '')
-# labelEncoding
-le = LabelEncoder()
-le.fit(df['country'])
-label_encoded_column = le.fit_transform(df['country'])
-df['country'] = pd.Series(label_encoded_column).astype('category')
 
 df['html_content'] = df['html_content'].astype(str)
 cat1 = df['category1'].tolist()
@@ -42,6 +38,14 @@ for cat1_, cat2_, text in zip(cat1, cat2, replaced_texts):
     found = text.replace('<div class="contents">', '')[:-6]
     converted_texts.append(cat1_ + ' ' + cat2_ + ' ' + found)
 df['html_content'] = converted_texts
+
+# labelEncoding
+category_list = ['country', 'category1', 'category2']
+for cat in category_list:
+    le = LabelEncoder()
+    le.fit(df[cat])
+    label_encoded_column = le.fit_transform(df[cat])
+    df[cat] = pd.Series(label_encoded_column).astype('category')
 
 df_train = df[df['train_flag']==True]
 df_train = df_train.drop(['train_flag'], axis=1)

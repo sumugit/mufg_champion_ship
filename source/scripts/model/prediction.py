@@ -40,7 +40,7 @@ def pseudo_inferring(cfg, fold_train, test):
                 encoding[k] = v.to(cfg.device)
             with autocast():
                 output = model(encoding)
-            output = output.softmax(axis=1).detach().cpu().numpy()
+            output = output.sigmoid().detach().cpu().numpy()  # クラス数に応じて修正
             test_pred.append(output)
     # バッチ毎 → 個別のレコード毎
     test_pred = np.concatenate(test_pred)
@@ -59,13 +59,13 @@ def pseudo_inferring(cfg, fold_train, test):
 def inferring(cfg, test):
     # 各Foldで学習させた最良モデルの重み path 表示
     print('\n'.join(cfg.model_weights))
-    sub_pred = np.zeros((len(test), 4), dtype=np.float32)
+    sub_pred = np.zeros((len(test), cfg.num_class), dtype=np.float32)
     # 各Foldで学習したモデルの重みを読込
     for fold, model_weight in enumerate(cfg.model_weights):
         # dataset, dataloaderの作成
         test_dataset = BERTDataset(
             cfg,
-            test[cfg.target].to_numpy()
+            test['html_content'].to_numpy()
         )
         test_loader = DataLoader(
             dataset=test_dataset,
@@ -87,7 +87,7 @@ def inferring(cfg, test):
                     encoding[k] = v.to(cfg.device)
                 with autocast():
                     output = model(encoding)
-                output = output.softmax(axis=1).detach().cpu().numpy()
+                output = output.sigmoid().detach().cpu().numpy()  # クラス数に応じて修正
                 fold_pred.append(output)
         fold_pred = np.concatenate(fold_pred)
         

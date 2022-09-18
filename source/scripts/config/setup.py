@@ -11,15 +11,15 @@ def setup(cfg):
     cfg.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Dir 設定
     cfg.OUTPUT = os.path.join(cfg.CURRENT_PATH, "Output")
-    cfg.EXP = os.path.join(cfg.OUTPUT, "OUT_EX001")  # 適宜修正
+    cfg.EXP = os.path.join(cfg.OUTPUT, "OUT_EX003")  # 適宜修正
     cfg.PRETRAIN = os.path.join(cfg.CURRENT_PATH, "pretrain")
     cfg.INPUT = os.path.join(cfg.CURRENT_PATH, "Input")
     cfg.DATASET = os.path.join(cfg.CURRENT_PATH, "Dataset")
 
     cfg.OUTPUT_EXP = os.path.join(cfg.OUTPUT, cfg.EXP)
-    cfg.FINAL = os.path.join(cfg.OUTPUT, "final")
+    cfg.FINAL = os.path.join(cfg.OUTPUT, "Ensemble")
     cfg.EXP_PRETRAIN = os.path.join(
-        cfg.PRETRAIN, "roberta_large_5fold_42")  # 適宜修正
+        cfg.PRETRAIN, "roberdta_large_5fold_42")  # 適宜修正
     cfg.EXP_MODEL = os.path.join(cfg.EXP, "model")
     cfg.EXP_FIG = os.path.join(cfg.EXP, "fig")
     cfg.EXP_PREDS = os.path.join(cfg.EXP, "preds")
@@ -29,7 +29,7 @@ def setup(cfg):
         os.makedirs(d, exist_ok=True)
     return cfg
 
-def set_seed(seed=2022):
+def set_seed(seed=2014):
     """ config seed number """
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)

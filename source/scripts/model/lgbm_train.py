@@ -7,6 +7,7 @@ sys.path.append('../')
 from config.config import Config
 import config.setup as setup
 import pandas as pd
+import pickle
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -15,24 +16,19 @@ cfg = setup.setup(Config)
 setup.set_seed(cfg.seed)
 
 # データの読込
-train_processed = pd.read_csv(os.path.join(
-    cfg.INPUT, "processed/processed_train.csv"))
-test_processed = pd.read_csv(os.path.join(
-    cfg.INPUT, "processed/processed_test.csv"))
-train_processed = train_processed.drop(
-    ['id', 'goal', 'category1', 'category2', 'html_content'], axis=1)
-test_processed = test_processed.drop(
-    ['id', 'goal', 'category1', 'category2', 'html_content'], axis=1)
-train_processed['country'] = train_processed['country'].astype('category')
-test_processed['country'] = test_processed['country'].astype('category')
+train_processed = pd.read_csv(os.path.join(cfg.INPUT, "processed/processed_train.csv"))
+test_processed = pd.read_csv(os.path.join(cfg.INPUT, "processed/processed_test.csv"))
+train_processed = train_processed.drop(['id', 'goal', 'html_content'], axis=1)
+test_processed = test_processed.drop(['id', 'goal', 'html_content'], axis=1)
+# train_processed['country'] = train_processed['country'].astype('category')
+# test_processed['country'] = test_processed['country'].astype('category')
 
 # stratifiedKFold
 cfg.folds = setup.get_stratifiedkfold(
     train_processed, cfg.target, cfg.num_fold, cfg.seed)
-# cfg.folds.to_csv(os.path.join(cfg.EXP_PREDS, "folds_lightgbm.csv"), header=False)  # fold の index 保存
+cfg.folds.to_csv(os.path.join(cfg.EXP_PREDS, "folds_lightgbm.csv"), header=False)  # fold の index 保存
 
 
-models = []
 scores = []
 
 for fold in cfg.trn_fold:
@@ -44,13 +40,13 @@ for fold in cfg.trn_fold:
     X_train, X_valid = train_df.drop(
         [cfg.target], axis=1), valid_df.drop([cfg.target], axis=1)
     y_train, y_valid = train_df[cfg.target], valid_df[cfg.target]
-    lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=['country'], free_raw_data=False)
-    lgb_eval = lgb.Dataset(X_valid, y_valid, categorical_feature=['country'], free_raw_data=False)
+    lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=['country', 'category1', 'category2'], free_raw_data=False)
+    lgb_eval = lgb.Dataset(X_valid, y_valid, categorical_feature=['country', 'category1', 'category2'], free_raw_data=False)
 
     params = {
-        'num_leaves': int(params['num_leaves']),
-        'max_depth': int(params['max_depth']),
-        'reg_lambda': params['reg_lambda'],
+        'num_leaves': 26,
+        'max_depth': 8,
+        'reg_lambda': 0.03565525423207128,
         'objective': 'binary',
         'metric': 'binary_logloss',
         'n_estimators': 1000,
@@ -69,8 +65,10 @@ for fold in cfg.trn_fold:
     y_valid_pred = model.predict(X_valid, num_iteration=model.best_iteration)
     y_valid_pred = [1 if val > 0.5 else 0 for val in y_valid_pred]
     score = f1_score(y_valid, y_valid_pred)
+    print(f'fold{fold} CV: {score}')
     
-    models.append(model)
+    file = os.path.join(cfg.EXP_MODEL, f'lgbm_fold{fold}.pth')
+    pickle.dump(model, open(file, 'wb'))
     scores.append(score)
 
 print(f'CV: {np.mean(scores)}')

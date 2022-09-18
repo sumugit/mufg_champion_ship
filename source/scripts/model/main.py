@@ -17,6 +17,7 @@ warnings.filterwarnings('ignore')
 cfg = setup.setup(Config)
 
 # データの読込
+
 dataset_train = pd.read_csv(os.path.join(cfg.INPUT, 'processed/processed_train.csv'))
 dataset_test = pd.read_csv(os.path.join(cfg.INPUT, 'processed/processed_test.csv'))
 dataset_train['html_content'] = dataset_train['html_content'].astype(str)

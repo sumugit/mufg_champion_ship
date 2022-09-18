@@ -1,1 +1,14 @@
-# project
+- EX001 : deberta-v3-large_5fold
+    - SEED : 2022
+    - CV : 0.80623
+    - LB : 0.81702
+- EX002 : deberta-v3-large_5fold
+    - SEED : 1998
+    - CV : 0.80501
+    - LB : 0.82094
+- LGBM
+    - EX003
+        - SEED : 2014
+        - TUN : {'num_leaves': 26, 'max_depth': 8, 'reg_lambda': 0.03565525423207128}
+        - CV : 0.75808
+        - LB : 

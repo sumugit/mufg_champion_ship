@@ -59,7 +59,7 @@ def get_optimizer_grouped_parameters(
 def training(cfg, train, test):
     setup.set_seed(cfg.seed)
     # 全 epoch 学習後の最良モデルにおけるクラスの予測値格納
-    oof_pred = np.zeros((len(train), 4), dtype=np.float32)
+    oof_pred = np.zeros((len(train), cfg.num_class), dtype=np.float32)
 
     # 損失関数: クロスエントロピー誤差
     # criterion = nn.CrossEntropyLoss(label_smoothing=cfg.epsilon)  # label smoothing あり
@@ -265,7 +265,7 @@ def training(cfg, train, test):
                                 'val_loss': loss.item()
                             })
 
-                val_preds = np.concatenate(val_preds)  # 各レコードの 4 クラス予測値を格納
+                val_preds = np.concatenate(val_preds)  # 各レコードの 2 クラス予測値を格納
                 val_loss = sum(val_losses) / sum(val_nums)
                 # validation 評価
                 score = f1_score(np.argmax(val_preds, axis=1),
@@ -300,6 +300,6 @@ def training(cfg, train, test):
     # 全ての KFold から得られた予測値を保存
     np.save(os.path.join(cfg.EXP_PREDS, 'oof_pred.npy'), oof_pred)
     score = f1_score(np.argmax(oof_pred, axis=1),
-                    train[cfg.target] - 1)
+                    train[cfg.target])
     print('CV:', round(score, 5))
     return score

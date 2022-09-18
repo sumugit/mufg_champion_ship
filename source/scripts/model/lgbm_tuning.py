@@ -18,10 +18,10 @@ setup.set_seed(cfg.seed)
 # データの読込
 train_processed = pd.read_csv(os.path.join(cfg.INPUT, "processed/processed_train.csv"))
 test_processed = pd.read_csv(os.path.join(cfg.INPUT, "processed/processed_test.csv"))
-train_processed = train_processed.drop(['id', 'goal', 'category1', 'category2', 'html_content'], axis=1)
-test_processed = test_processed.drop(['id', 'goal', 'category1', 'category2', 'html_content'], axis=1)
-train_processed['country'] = train_processed['country'].astype('category')
-test_processed['country'] = test_processed['country'].astype('category')
+train_processed = train_processed.drop(['id', 'goal', 'html_content'], axis=1)
+test_processed = test_processed.drop(['id', 'goal', 'html_content'], axis=1)
+# train_processed['country'] = train_processed['country'].astype('category')
+# test_processed['country'] = test_processed['country'].astype('category')
 
 # stratifiedKFold
 cfg.folds = setup.get_stratifiedkfold(train_processed, cfg.target, cfg.num_fold, cfg.seed)
@@ -62,8 +62,8 @@ for fold in cfg.trn_fold:
     train_idx = list(train_df.index)
     X_train, X_valid = train_df.drop([cfg.target], axis=1), valid_df.drop([cfg.target], axis=1)
     y_train, y_valid = train_df[cfg.target], valid_df[cfg.target]
-    lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=['country'], free_raw_data=False)
-    lgb_eval = lgb.Dataset(X_valid, y_valid, categorical_feature=['country'], free_raw_data=False)
+    lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=['country', 'category1', 'category2'], free_raw_data=False)
+    lgb_eval = lgb.Dataset(X_valid, y_valid, categorical_feature=['country', 'category1', 'category2'], free_raw_data=False)
     
     # hyperopt でパラメタチューニング
     params_hyperopt = {
