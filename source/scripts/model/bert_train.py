@@ -174,6 +174,7 @@ def training(cfg, train, test):
                 # val_losses_batch = []
                 scaler = GradScaler()
                 # fgm = FGM(model)
+                ### AWP ###
                 """
                 awp = AWP(
                     model,
@@ -184,6 +185,7 @@ def training(cfg, train, test):
                     scaler=scaler
                 )
                 """
+                ### AWP ###
                 # progress bar は pbar と表記することが多いみたい...
                 with tqdm(train_loader, total=len(train_loader), disable=cfg.disable) as pbar:
                     # batch 毎の処理 (batch_size は DataLoader で定義済み)
@@ -213,6 +215,7 @@ def training(cfg, train, test):
                         # Adversarial training
                         # embedding layer に敵対的な摂動を加える
                         # fgm.attack()
+                        ### AWP ###
                         """
                         awp.attack_backward(encoding, labels, epoch)
                         # 敵対的な摂動を加えられた状態での損失を計算
@@ -231,6 +234,7 @@ def training(cfg, train, test):
                         # fgm.restore()
                         awp.restore()
                         """
+                        ### AWP ###
                         # Clipping gradients
                         if cfg.clip_grad_norm is not None:
                             torch.nn.utils.clip_grad_norm_(

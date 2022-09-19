@@ -11,7 +11,7 @@ def setup(cfg):
     cfg.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Dir 設定
     cfg.OUTPUT = os.path.join(cfg.CURRENT_PATH, "Output")
-    cfg.EXP = os.path.join(cfg.OUTPUT, "OUT_EX004")  # 適宜修正
+    cfg.EXP = os.path.join(cfg.OUTPUT, "OUT_EX006")  # 適宜修正
     cfg.PRETRAIN = os.path.join(cfg.CURRENT_PATH, "pretrain")
     cfg.INPUT = os.path.join(cfg.CURRENT_PATH, "Input")
     cfg.DATASET = os.path.join(cfg.CURRENT_PATH, "Dataset")
@@ -29,7 +29,7 @@ def setup(cfg):
         os.makedirs(d, exist_ok=True)
     return cfg
 
-def set_seed(seed=2018):
+def set_seed(seed=42):
     """ config seed number """
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
