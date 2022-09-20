@@ -22,7 +22,17 @@
 - EX005 : roberta-large_5fold
     - SEED : 42
     - CV : 0.80100
-    - LB : 
+    - LB : 0.81177
+- EX006 : roberta-large_5fold (AWP)
+    - SEED : 42
+    - CV : 0.79292
+    - LB : 0.81143
 - Ensemble : 1,2,3,4,5,lgbm
     - CV : 0.82213
-    - LB : 0.82821
+    - LB : 0.82881
+- Stacking1
+    - {'num_leaves': 26, 'max_depth': 20, 'reg_lambda': 0.0970996171664033}
+    - CV: 0.828777
+    - LB : 0.78233
+- Stacking2
+    - CV: 0.827000

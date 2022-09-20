@@ -175,7 +175,6 @@ def training(cfg, train, test):
                 scaler = GradScaler()
                 # fgm = FGM(model)
                 ### AWP ###
-                """
                 awp = AWP(
                     model,
                     optimizer,
@@ -184,7 +183,6 @@ def training(cfg, train, test):
                     start_epoch=cfg.start_epoch,
                     scaler=scaler
                 )
-                """
                 ### AWP ###
                 # progress bar は pbar と表記することが多いみたい...
                 with tqdm(train_loader, total=len(train_loader), disable=cfg.disable) as pbar:
@@ -216,7 +214,6 @@ def training(cfg, train, test):
                         # embedding layer に敵対的な摂動を加える
                         # fgm.attack()
                         ### AWP ###
-                        """
                         awp.attack_backward(encoding, labels, epoch)
                         # 敵対的な摂動を加えられた状態での損失を計算
                         
@@ -233,7 +230,6 @@ def training(cfg, train, test):
                         
                         # fgm.restore()
                         awp.restore()
-                        """
                         ### AWP ###
                         # Clipping gradients
                         if cfg.clip_grad_norm is not None:

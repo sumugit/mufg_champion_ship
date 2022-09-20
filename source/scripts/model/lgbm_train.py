@@ -72,3 +72,4 @@ for fold in cfg.trn_fold:
     scores.append(score)
 
 print(f'CV: {np.mean(scores)}')
+
