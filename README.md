@@ -27,12 +27,30 @@
     - SEED : 42
     - CV : 0.79292
     - LB : 0.81143
+- EX007 : deberta-large-5fold (AWP)
+    - SEED : 2022
+    - CV : 0.80696
+    - LB : 0.81932
 - Ensemble : 1,2,3,4,5,lgbm
     - CV : 0.82213
     - LB : 0.82881
-- Stacking1
+- Ensemble : 7,2,3,4,5,lgbm
+    - CV : 0.82317
+- Ensemble : 7,2,3,4,6,lgbm
+    - CV : 0.82354
+- Stacking1 : 12345
     - {'num_leaves': 26, 'max_depth': 20, 'reg_lambda': 0.0970996171664033}
     - CV: 0.828777
     - LB : 0.78233
-- Stacking2
-    - CV: 0.827000
+- Stacking2 : 12345 (not in lgbm)
+    - SEED : 2022
+    - CV : 0.82700
+    - LB : 0.82938
+- Stacking3 : 72346
+    - SEED : 2022
+    - CV : 0.82441
+    - LB : 
+- Stacking4 : 72345
+    - SEED : 2022
+    - CV : 0.82684
+    - LB : 

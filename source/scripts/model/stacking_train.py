@@ -25,7 +25,7 @@ submission = pd.read_csv(os.path.join(cfg.INPUT, 'raw/sample_submit.csv'), heade
 # dataset_train['html_content'] = dataset_train['html_content'].astype(str)
 # dataset_test['html_content'] = dataset_test['html_content'].astype(str)
 
-ensemble_list = ['OUT_EX001', 'OUT_EX002', 'OUT_EX003', 'OUT_EX004', 'OUT_EX005']
+ensemble_list = ['OUT_EX007', 'OUT_EX002', 'OUT_EX003', 'OUT_EX004', 'OUT_EX005']
 for out in ensemble_list:
     expxxx = os.path.join(cfg.OUTPUT, out)
     expxxx_model = os.path.join(expxxx, 'preds')
@@ -77,7 +77,8 @@ for fold in cfg.trn_fold:
         'n_estimators': 1000,
         'learning_rate': 0.01,
         'verbose': -1,
-        'num_iteration': 100
+        'num_iteration': 100,
+        'random_state' : cfg.seed
     }
     model = lgb.train(
         params,
@@ -102,4 +103,4 @@ for fold in cfg.trn_fold:
 print(sub_pred)
 print(f'CV: {round(np.mean(scores), 5)}')
 submission[1] = np.argmax(sub_pred, axis=1)
-submission.to_csv(os.path.join(cfg.STACK, 'stacking2_submission.csv'), index=False, header=False)
+submission.to_csv(os.path.join(cfg.STACK, 'stacking72345_submission.csv'), index=False, header=False)
