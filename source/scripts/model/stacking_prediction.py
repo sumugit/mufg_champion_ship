@@ -67,6 +67,6 @@ for fold, model_path in enumerate(cfg.lgbm_models):
 np.save(os.path.join(cfg.STACK, f'lgbm_oof_pred.npy'), oof_pred)
 np.save(os.path.join(cfg.STACK, f'lgbm_sub_pred.npy'), sub_pred)
 score = f1_score(dataset_train[cfg.target], np.argmax(oof_pred, axis=1))
-print(f'CV: {score}')
+print(f'CV : {round(score, 5)}')
 submission[1] = np.argmax(sub_pred, axis=1)
 submission.to_csv(os.path.join(cfg.STACK, 'stacking_submission.csv'), index=False, header=False)

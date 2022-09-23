@@ -26,15 +26,17 @@ submission = pd.read_csv(os.path.join(cfg.INPUT, 'raw/sample_submit.csv'), heade
 
 oof_pred = np.zeros(shape=(dataset_train.shape[0], cfg.num_class))
 sub_pred = np.zeros(shape=(dataset_test.shape[0], cfg.num_class))
+weight = np.array([1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 25])/12
 
-ensemble_list = ['OUT_EX007', 'OUT_EX002', 'OUT_EX003', 'OUT_EX004', 'OUT_EX006']
+ensemble_list = ['OUT_EX001', 'OUT_EX002', 'OUT_EX003', 'OUT_EX004', 'OUT_EX005', 'OUT_EX006',
+                'OUT_EX007', 'OUT_EX008', 'OUT_EX009', 'OUT_EX0010']
 for out in ensemble_list:
     expxxx = os.path.join(cfg.OUTPUT, out)
     expxxx_model = os.path.join(expxxx, 'preds')
     oof_pred += np.load(os.path.join(expxxx_model, 'oof_pred.npy'))
     sub_pred += np.load(os.path.join(expxxx_model, 'sub_pred.npy'))
 
-lgbm_list = ['OUT_EX003']
+lgbm_list = ['OUT_EX0010']
 for out in lgbm_list:
     expxxx = os.path.join(cfg.OUTPUT, out)
     expxxx_model = os.path.join(expxxx, 'preds')
@@ -51,5 +53,5 @@ submission[1] = np.argmax(sub_pred, axis=1)
 submission[1] = submission[1].astype(int)
 
 # 提出用ファイル
-submission.to_csv(os.path.join(cfg.FINAL, 'submission_72346.csv'),
+submission.to_csv(os.path.join(cfg.FINAL, 'submission_ensemble.csv'),
                 index=False, header=False)

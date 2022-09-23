@@ -18,15 +18,14 @@ df_train = pd.DataFrame()
 df_test = pd.DataFrame()
 
 dataset_train = pd.read_csv(os.path.join(cfg.INPUT, 'processed/processed_train.csv'))
-dataset_test = pd.read_csv(os.path.join(cfg.INPUT, 'processed/processed_test.csv'))
+#dataset_test = pd.read_csv(os.path.join(cfg.INPUT, 'processed/processed_test.csv'))
 dataset_train = dataset_train.drop(['id', 'goal', 'html_content'], axis=1)
-dataset_test = dataset_test.drop(['id', 'goal', 'html_content'], axis=1)
+#dataset_test = dataset_test.drop(['id', 'goal', 'html_content'], axis=1)
 submission = pd.read_csv(os.path.join(cfg.INPUT, 'raw/sample_submit.csv'), header=None)
 # dataset_train['html_content'] = dataset_train['html_content'].astype(str)
 # dataset_test['html_content'] = dataset_test['html_content'].astype(str)
 
-ensemble_list = ['OUT_EX001', 'OUT_EX002', 'OUT_EX003', 'OUT_EX004', 'OUT_EX005', 'OUT_EX006',
-                'OUT_EX007', 'OUT_EX008', 'OUT_EX009', 'OUT_EX0010']
+ensemble_list = ['OUT_EX006', 'OUT_EX007', 'OUT_EX008', 'OUT_EX009', 'OUT_EX0010']
 for out in ensemble_list:
     expxxx = os.path.join(cfg.OUTPUT, out)
     expxxx_model = os.path.join(expxxx, 'preds')
@@ -35,8 +34,8 @@ for out in ensemble_list:
     df_train[out] = [pred[1]/sum(pred) for pred in oof_pred]
     df_test[out] = [pred[1]/sum(pred) for pred in sub_pred]
 
-"""
-lgbm_list = ['OUT_EX003']
+
+lgbm_list = ['OUT_EX0010']
 for out in lgbm_list:
     expxxx = os.path.join(cfg.OUTPUT, out)
     expxxx_model = os.path.join(expxxx, 'preds')
@@ -44,11 +43,11 @@ for out in lgbm_list:
     sub_pred = np.load(os.path.join(expxxx_model, 'lgbm_sub_pred.npy'))
     df_train['lgbm'] = [pred[1] for pred in oof_pred]
     df_test['lgbm'] = [pred[1] for pred in sub_pred]
-"""
+
 
 # 結合
-df_train = pd.concat([dataset_train, df_train], axis=1)
-df_test = pd.concat([dataset_test, df_test], axis=1)
+df_train = pd.concat([dataset_train[cfg.target], df_train], axis=1)
+# df_test = pd.concat([dataset_test, df_test], axis=1)
 
 
 # stratifiedKFold
@@ -56,8 +55,6 @@ cfg.folds = setup.get_stratifiedkfold(df_train, cfg.target, cfg.num_fold, cfg.se
 cfg.folds.to_csv(os.path.join(cfg.STACK, "folds_stacking.csv"), header=False)  # fold の index 保存
 
 scores = []
-cat = ['country', 'category1', 'category2']
-oof_pred = np.zeros((len(df_train), cfg.num_class), dtype=np.float32)
 sub_pred = np.zeros((len(df_test), cfg.num_class), dtype=np.float32)
 
 for fold in cfg.trn_fold:
@@ -68,8 +65,8 @@ for fold in cfg.trn_fold:
     train_idx = list(train_df.index)
     X_train, X_valid = train_df.drop([cfg.target], axis=1), valid_df.drop([cfg.target], axis=1)
     y_train, y_valid = train_df[cfg.target], valid_df[cfg.target]
-    lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=cat, free_raw_data=False)
-    lgb_eval = lgb.Dataset(X_valid, y_valid, categorical_feature=cat, free_raw_data=False)
+    lgb_train = lgb.Dataset(X_train, y_train, free_raw_data=False)
+    lgb_eval = lgb.Dataset(X_valid, y_valid, free_raw_data=False)
     
     params = {
         'num_leaves': 64,
@@ -99,10 +96,10 @@ for fold in cfg.trn_fold:
     pickle.dump(model, open(file, 'wb'))
     scores.append(score)
     # テストデータで予測
-    fold_test_pred = [[1-pred, pred] for pred in model.predict(df_test.drop([cfg.target], axis=1))]
+    # 各 Fold の予測値をアンサンブル
+    fold_test_pred = [[1-pred, pred] for pred in model.predict(df_test)]
     sub_pred += np.array(fold_test_pred) / cfg.num_fold
 
-print(sub_pred)
-print(f'CV: {round(np.mean(scores), 5)}')
+print(f'CV : {round(np.mean(scores), 5)}')
 submission[1] = np.argmax(sub_pred, axis=1)
-submission.to_csv(os.path.join(cfg.STACK, 'stacking_submission.csv'), index=False, header=False)
+submission.to_csv(os.path.join(cfg.STACK, 'stacking_default.csv'), index=False, header=False)

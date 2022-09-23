@@ -29,7 +29,10 @@ cfg.folds = setup.get_stratifiedkfold(
 cfg.folds.to_csv(os.path.join(cfg.EXP_PREDS, "folds_lightgbm.csv"), header=False)  # fold の index 保存
 
 
-scores = []
+# scores = []
+cat = ['country', 'category1', 'category2']
+oof_pred = np.zeros((len(train_processed), cfg.num_class), dtype=np.float32)
+sub_pred = np.zeros((len(test_processed), cfg.num_class), dtype=np.float32)
 
 for fold in cfg.trn_fold:
     train_df = train_processed.loc[cfg.folds != fold]
@@ -40,13 +43,12 @@ for fold in cfg.trn_fold:
     X_train, X_valid = train_df.drop(
         [cfg.target], axis=1), valid_df.drop([cfg.target], axis=1)
     y_train, y_valid = train_df[cfg.target], valid_df[cfg.target]
-    lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=['country', 'category1', 'category2'], free_raw_data=False)
-    lgb_eval = lgb.Dataset(X_valid, y_valid, categorical_feature=['country', 'category1', 'category2'], free_raw_data=False)
+    lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=cat, free_raw_data=False)
+    lgb_eval = lgb.Dataset(X_valid, y_valid, categorical_feature=cat, free_raw_data=False)
 
     params = {
-        'num_leaves': 26,
-        'max_depth': 8,
-        'reg_lambda': 0.03565525423207128,
+        'num_leaves': 64,
+        'max_depth': 5,
         'objective': 'binary',
         'metric': 'binary_logloss',
         'n_estimators': 1000,
@@ -65,11 +67,22 @@ for fold in cfg.trn_fold:
     y_valid_pred = model.predict(X_valid, num_iteration=model.best_iteration)
     y_valid_pred = [1 if val > 0.5 else 0 for val in y_valid_pred]
     score = f1_score(y_valid, y_valid_pred)
-    print(f'fold{fold} CV: {score}')
+    print(f'fold{fold} CV : {round(score,5)}')
     
     file = os.path.join(cfg.EXP_MODEL, f'lgbm_fold{fold}.pth')
     pickle.dump(model, open(file, 'wb'))
-    scores.append(score)
+    # scores.append(score)
+    # 各 Fold の予測値をアンサンブル
+    # テストデータで予測
+    fold_train_pred = [[1-pred, pred] for pred in model.predict(train_processed.drop([cfg.target], axis=1))]
+    fold_test_pred = [[1-pred, pred] for pred in model.predict(test_processed.drop([cfg.target], axis=1))]
+    # 各 Fold の予測値をアンサンブル
+    oof_pred += np.array(fold_train_pred) / cfg.num_fold
+    sub_pred += np.array(fold_test_pred) / cfg.num_fold
 
-print(f'CV: {np.mean(scores)}')
+np.save(os.path.join(cfg.EXP_PREDS, f'lgbm_oof_pred.npy'), oof_pred)
+np.save(os.path.join(cfg.EXP_PREDS, f'lgbm_sub_pred.npy'), sub_pred)
+score = f1_score(train_processed[cfg.target], np.argmax(oof_pred, axis=1))
+print(f'CV : {round(score, 5)}')
+# print(f'CV : {round(np.mean(scores),5)}')
 
