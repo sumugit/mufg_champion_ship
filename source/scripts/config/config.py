@@ -11,7 +11,7 @@ class Config:
     num_class = 2                   # クラス数
     seed = 1998                     # seed 値
     num_fold = 5                    # CV 分割数
-    trn_fold = range(5)             # Fold
+    trn_fold = range(num_fold)      # Fold
     batch_size = 8                  # batct_size の設定
     n_epochs = 5                    # epoch 数の設定
     max_len = 256                   # token 数の最大の長さの設定

@@ -59,7 +59,7 @@ class BERTModel(nn.Module):
         )
         # 事前学習モデルの読込
         self.backbone = AutoModel.from_pretrained(
-            cfg.MODEL_PATH2,
+            cfg.MODEL_PATH,
             config=self.config
         )
         # 全結合: 出力が 4クラス (次元) となるように線形変換
